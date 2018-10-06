@@ -6,11 +6,7 @@ nibbler::nibbler() : _time{0}, _delay{DELAY} {}
 
 nibbler::~nibbler()
 {
-	FreeMemory();
-
 	_display->ExitDisplay();
-	delete _display;
-
 	dlclose(_dl);
 }
 
@@ -31,15 +27,15 @@ void			nibbler::Play(unsigned height, unsigned width, char *type)
 		{
 			if (_interface.GetEnter() == true && _interface.GetChoise() == 0)
 			{
-				_players.push_back(new snake(height, width, '0'));
+				_players.push_back(std::make_unique(height, width, '0'));
 				_interface.SetGame(true);
 				_interface.SetPause(false);
 				_interface.SetEnter(false);
 			}
 			else if (_interface.GetEnter() == true && _interface.GetChoise() == 1)
 			{
-				_players.push_back(new snake(height, width + 10, '0'));
-				_players.push_back(new snake(height, width - 10, '1'));
+				_players.push_back(std::make_unique(height, width + 10, '0'));
+				_players.push_back(std::make_unique(height, width - 10, '1'));
 				_interface.SetGame(true);
 				_interface.SetPause(false);
 				_interface.SetEnter(false);
@@ -78,8 +74,6 @@ void			nibbler::Play(unsigned height, unsigned width, char *type)
 				CreateBonus(height, width);
 			if (_time % (17500 / SPEED) == 0 && _bonus.size())
 			{
-				obj* buff = _bonus.back();
-				delete buff;
 				_bonus.pop_back();
 			}
 
@@ -115,13 +109,12 @@ void			nibbler::Play(unsigned height, unsigned width, char *type)
 
 void			nibbler::CreateWalls(unsigned h, unsigned w)
 {
-	obj* buff;
 	bool coincidence = true;
 
 	while (coincidence == true)
 	{
 		coincidence = false;
-		_walls.push_back(new obj(h, w, ' ', true));
+		_walls.push_back(std::make_unique(h, w, ' ', true));
 
 		/*with himself*/
 		for (size_t k = 0; k < _walls.size() - 1; k++)
@@ -129,8 +122,6 @@ void			nibbler::CreateWalls(unsigned h, unsigned w)
 			if (_walls.back()->GetPosition().x == _walls[k]->GetPosition().x
 				&&	_walls.back()->GetPosition().y == _walls[k]->GetPosition().y)
 			{
-				buff = _walls.back();
-				delete buff;
 				_walls.pop_back();
 				coincidence = true;
 				break ;
@@ -143,8 +134,6 @@ void			nibbler::CreateWalls(unsigned h, unsigned w)
 			if (_walls.back()->GetPosition().x == _foods[k]->GetPosition().x
 				&&	_walls.back()->GetPosition().y == _foods[k]->GetPosition().y)
 			{
-				buff = _walls.back();
-				delete buff;
 				_walls.pop_back();
 				coincidence = true;
 				break ;
@@ -159,8 +148,6 @@ void			nibbler::CreateWalls(unsigned h, unsigned w)
 				if (_walls.back()->GetPosition().x == _players[i]->pos[j]->GetPosition().x
 					&& _walls.back()->GetPosition().y == _players[i]->pos[j]->GetPosition().y)
 				{
-					buff = _walls.back();
-					delete buff;
 					_walls.pop_back();
 					coincidence = true;
 					break ;
@@ -174,7 +161,6 @@ void			nibbler::CreateWalls(unsigned h, unsigned w)
 
 void			nibbler::CreateFoods(unsigned h, unsigned w)
 {
-	obj* buff;
 	bool coincidence = true;
 
 	unsigned len = _players[0]->pos.size();
@@ -186,7 +172,7 @@ void			nibbler::CreateFoods(unsigned h, unsigned w)
 		while (coincidence == true)
 		{
 			coincidence = false;
-			_foods.push_back(new obj(h, w, '*', true));
+			_foods.push_back(std::make_unique(h, w, '*', true));
 
 			/*with himself*/
 			for (size_t k = 0; k < _foods.size() - 1; k++)
@@ -194,8 +180,6 @@ void			nibbler::CreateFoods(unsigned h, unsigned w)
 				if (_foods.back()->GetPosition().x == _foods[k]->GetPosition().x
 					&&	_foods.back()->GetPosition().y == _foods[k]->GetPosition().y)
 				{
-					buff = _foods.back();
-					delete buff;
 					_foods.pop_back();
 					coincidence = true;
 					break ;
@@ -210,8 +194,6 @@ void			nibbler::CreateFoods(unsigned h, unsigned w)
 					if (_foods.back()->GetPosition().x == _players[i]->pos[j]->GetPosition().x
 						&& _foods.back()->GetPosition().y == _players[i]->pos[j]->GetPosition().y)
 					{
-						buff = _foods.back();
-						delete buff;
 						_foods.pop_back();
 						coincidence = true;
 						break ;
@@ -227,8 +209,6 @@ void			nibbler::CreateFoods(unsigned h, unsigned w)
 				if (_foods.back()->GetPosition().x == _walls[k]->GetPosition().x
 					&&	_foods.back()->GetPosition().y == _walls[k]->GetPosition().y)
 				{
-					buff = _foods.back();
-					delete buff;
 					_foods.pop_back();
 					coincidence = true;
 					break ;
@@ -241,24 +221,21 @@ void			nibbler::CreateFoods(unsigned h, unsigned w)
 
 void			nibbler::CreateBonus(unsigned h, unsigned w)
 {
-	obj* buff;
 	bool coincidence = true;
 
 	while (coincidence == true)
 	{
 		coincidence = false;
-		_bonus.push_back(new obj(h, w, '+', true));
+		_bonus.push_back(std::make_unique(h, w, '+', true));
 
 		/*with players*/
-		for (size_t i = 0; i < _players.size(); i++)
+		for (size_t i = 0; i < _players.size(); ++i)
 		{
-			for (size_t j = 0; j < _players[i]->pos.size(); j++)
+			for (size_t j = 0; j < _players[i]->pos.size(); ++j)
 			{
 				if (_bonus.back()->GetPosition().x == _players[i]->pos[j]->GetPosition().x
 					&& _bonus.back()->GetPosition().y == _players[i]->pos[j]->GetPosition().y)
 				{
-					buff = _bonus.back();
-					delete buff;
 					_bonus.pop_back();
 					coincidence = true;
 					break ;
@@ -269,13 +246,11 @@ void			nibbler::CreateBonus(unsigned h, unsigned w)
 		}
 
 		/*with walls*/
-		for (size_t k = 0; k < _walls.size(); k++)
+		for (size_t k = 0; k < _walls.size(); ++k)
 		{
 			if (_foods.back()->GetPosition().x == _walls[k]->GetPosition().x
 				&&	_foods.back()->GetPosition().y == _walls[k]->GetPosition().y)
 			{
-				buff = _foods.back();
-				delete buff;
 				_foods.pop_back();
 				coincidence = true;
 				break ;
@@ -292,17 +267,11 @@ void			nibbler::IntersectPlayers(unsigned h, unsigned w)
 		int del = _players[i]->eat_foods(_foods);
 		if (del != -1)
 		{
-			obj* buff;
-			buff = _foods[del];
-			delete buff;
 			_foods.erase(_foods.begin() + del);
 		}
 
 		if (_bonus.size() != 0 && _players[i]->eat_bonus(_bonus))
 		{
-			obj* buff;
-			buff = _bonus[_bonus.size() - 1];
-			delete buff;
 			_bonus.pop_back();
 		}
 
@@ -356,7 +325,10 @@ void			nibbler::ResetGame()
 	if (_players.size() > 1)
 		_interface.SetLastScore1(_players[1]->GetScore());
 
-	FreeMemory();
+	_walls.clear();
+	_foods.clear();
+	_bonus.clear();
+	_players.clear();
 
 	_interface.SetEnter(false);
 	_interface.SetPause(true);
@@ -364,40 +336,6 @@ void			nibbler::ResetGame()
 	_interface.SetChoise(0);
 	_interface.SetDirectionPlayer0(0);
 	_interface.SetDirectionPlayer1(0);
-}
-
-void			nibbler::FreeMemory()
-{
-	obj*	buff_1;
-	snake*	buff_2;
-
-	while (_walls.size() > 0)
-	{
-		buff_1 = _walls.back();
-		delete buff_1;
-		_walls.pop_back();
-	}
-
-	while (_foods.size() > 0)
-	{
-		buff_1 = _foods.back();
-		delete buff_1;
-		_foods.pop_back();
-	}
-
-	while (_bonus.size() > 0)
-	{
-		buff_1 = _bonus.back();
-		delete buff_1;
-		_bonus.pop_back();
-	}
-
-	while (_players.size() > 0)
-	{
-		buff_2 = _players.back();
-		delete buff_2;
-		_players.pop_back();
-	}
 }
 
 void			nibbler::OpenLib(const char *name)
@@ -441,20 +379,28 @@ void 			nibbler::ChangeLib(size_t number, unsigned h, unsigned w)
 {
 	std::string name;
 
-	if (_dl_number != number)
+	if (_dl_number == number)
 	{
-		_display->ExitDisplay();
-		delete _display;
-		dlclose(_dl);
-		if (number == 0)
-			name = "-ncurses";
-		else if (number == 1)
-			name = "-sdl";
-		else if (number == 2)
-			name = "-sfml";
-		OpenLib(name.c_str());
-		_display->InitDisplay(h, w);
+		return ;
 	}
+
+	_display->ExitDisplay();
+	delete _display; ///release 
+	dlclose(_dl);
+	switch (number)
+	{
+		case (0):
+			name = "-ncurses";
+		case (1):
+			name = "-sdl";
+		case (2):
+			name = "-sfml";
+		default:
+			break;
+	}
+	
+	OpenLib(name.c_str());
+	_display->InitDisplay(h, w);
 }
 
 std::ostream &		operator<<(std::ostream & os, nibbler const & ref)

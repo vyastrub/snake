@@ -8,22 +8,10 @@ _move.down{false},
 _move.left{false},
 _move.right{false}
 {
-	pos.push_back(new obj( h / 2 + 0, w / 2, _number, false));
-	pos.push_back(new obj( h / 2 + 1, w / 2, _number, false));
-	pos.push_back(new obj( h / 2 + 2, w / 2, _number, false));
-	pos.push_back(new obj( h / 2 + 3, w / 2, _number, false));
-}
-
-snake::~snake()
-{
-	obj* buff;
-
-	while (pos.size() > 0)
-	{
-		buff = pos[pos.size() - 1];
-		delete buff;
-		pos.pop_back();
-	}
+	pos.push_back(std::make_unique( h / 2 + 0, w / 2, _number, false));
+	pos.push_back(std::make_unique( h / 2 + 1, w / 2, _number, false));
+	pos.push_back(std::make_unique( h / 2 + 2, w / 2, _number, false));
+	pos.push_back(std::make_unique( h / 2 + 3, w / 2, _number, false));
 }
 
 void snake::move(t_move direction)
@@ -70,14 +58,14 @@ void snake::move(t_move direction)
 		pos[0]->SetPosition(pos[0]->GetPosition().x + 1, pos[0]->GetPosition().y);
 }
 
-int	snake::eat_foods(std::vector<obj*> foods)
+int	snake::eat_foods(const objectsVector & foods)
 {
 	for (size_t i = 0; i < foods.size(); i++)
 	{
 	 	if (foods[i]->GetPosition().x == pos[0]->GetPosition().x
 	 			&& foods[i]->GetPosition().y == pos[0]->GetPosition().y)
 	 	{
- 			pos.push_back(new obj(pos[pos.size() - 1]->GetPosition().y, pos[pos.size() - 1]->GetPosition().x, _number, false));
+ 			pos.push_back(std::make_unique(pos[pos.size() - 1]->GetPosition().y, pos[pos.size() - 1]->GetPosition().x, _number, false));
 	 		_score++;
 	 		return i;
 	 	}
@@ -85,15 +73,13 @@ int	snake::eat_foods(std::vector<obj*> foods)
 	return -1;
 }
 
-bool snake::eat_bonus(std::vector<obj*> bonus)
+bool snake::eat_bonus(const objectsVector & bonus)
 {
 	if (bonus[0]->GetPosition().x == pos[0]->GetPosition().x
 			&& bonus[0]->GetPosition().y == pos[0]->GetPosition().y)
 	{
 		while (pos.size() > 3)
 		{
-			obj* buff = pos.back();
-			delete buff;
 			pos.pop_back();
 		}
 		_score += 10;
@@ -102,7 +88,7 @@ bool snake::eat_bonus(std::vector<obj*> bonus)
 	return false;
 }
 
-bool snake::intersect_walls(std::vector<obj*> walls)
+bool snake::intersect_walls(const objectsVector & walls)
 {
 	for (size_t i = 0; i < walls.size(); i++)
 	{

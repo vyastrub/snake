@@ -2,6 +2,9 @@
 #include <vector>
 #include "obj.hpp"
 
+typedef std::unique_ptr<obj*> objPtr;
+typedef std::vector<objPtr> objectsVector;
+
 typedef struct 	s_move
 {
 	bool		up;
@@ -16,7 +19,7 @@ public:
 	snake() = delete;
 	snake(unsigned h, unsigned w, char n);
 	snake(snake const & ref) = default;
-	~snake();         // to default
+	~snake() = default; 
 	snake & operator=(snake const & ref) = default;
 
 	void move(t_move direction);
@@ -28,7 +31,7 @@ public:
 	unsigned GetScore() const;
 	unsigned GetLen() const;
 
-	std::vector<obj*> 	pos;
+	objectsVector 	pos;
 
 private:
 	t_move		_move;

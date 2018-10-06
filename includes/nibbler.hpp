@@ -3,6 +3,7 @@
 #include <dlfcn.h>
 #include <unistd.h>
 #include <vector>
+#include <memory>
 #include "ApiDisplay.hpp"
 #include "menu.hpp"
 #include "snake.hpp"
@@ -10,6 +11,8 @@
 
 #define	DELAY 1000
 #define SPEED 4
+
+typedef std::unique_ptr<ApiDisplay*> displayPtr;
 
 class nibbler
 {
@@ -30,13 +33,13 @@ private:
 	
 	void*				_dl;
 	size_t				_dl_number;
-	ApiDisplay*			_display;
+	displayPtr			_display;
 	
-	std::vector<obj*>	_walls;
-	std::vector<obj*> 	_foods;
-	std::vector<obj*>	_bonus;
+	objectsVector	_walls;
+	objectsVector 	_foods;
+	objectsVector	_bonus;
 	
-	std::vector<snake*>	_players;
+	objectsVector	_players;
 	
 	void				OpenLib(const char *name);
 	void				ChangeLib(size_t number, unsigned h, unsigned w);
@@ -46,9 +49,7 @@ private:
 	void 				CreateBonus(unsigned h, unsigned w);
 	void				IntersectPlayers(unsigned h, unsigned w);
 	
-	
 	void				ResetGame();
-	void				FreeMemory();
 };
 
 std::ostream &	operator<<(std::ostream & os, nibbler const & ref);
